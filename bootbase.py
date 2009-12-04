@@ -41,7 +41,8 @@ class BootBaseTraits(object):
         if args:
             return args
         else:
-            raise ParseError()
+            x = str(''.join(self.input.data[max(0, self.input.position-1):]))
+            raise ParseError(self.input.position, None, "Grammar parse failed.\nLeftover bits:\n%s" % x)
 
     def ruleValueExpr(self):
         """
