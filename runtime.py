@@ -249,6 +249,8 @@ class OMetaBase(object):
         else:
             raise NameError("No rule named '%s'" %(ruleName,))
 
+    def rule_apply(self, ruleName, *args):
+        return self.apply(ruleName, *args)[0]
 
     def _apply(self, rule, ruleName, args):
         """
