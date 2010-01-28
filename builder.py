@@ -24,6 +24,9 @@ class TreeBuilder(object):
     def exactly(self, expr):
         return ["Exactly", expr]
 
+    def match_string(self, expr):
+        return ["MatchString", expr]
+
     def many(self, expr):
         return ["Many", expr]
 
@@ -156,9 +159,16 @@ class PythonWriter(object):
 
     def generate_Exactly(self, literal):
         """
-        Create a call to self.exactly(expr).
+        Create a call to self.exactly(literal).
         """
         return self._expr('exactly', 'self.exactly(%r)' % (literal,))
+
+
+    def generate_MatchString(self, literal):
+        """
+        Create a call to self.match_string(literal).
+        """
+        return self._expr('match_string', 'self.match_string(%r)' % (literal,))
 
 
     def generate_Many(self, expr):

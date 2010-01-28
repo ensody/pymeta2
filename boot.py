@@ -22,11 +22,9 @@ class BootOMetaGrammar(GrammarBase):
         _locals = {'self': self}
         self.locals['vspace'] = _locals
         def _G_or_1():
-            _G_python_1, lastError = eval('"\\r\\n"', self.globals, _locals), None
+            _G_match_string_1, lastError = self.match_string('\r\n')
             self.considerError(lastError)
-            _G_apply_2, lastError = self.apply("token", _G_python_1)
-            self.considerError(lastError)
-            return (_G_apply_2, self.currentError)
+            return (_G_match_string_1, self.currentError)
         def _G_or_2():
             _G_exactly_1, lastError = self.exactly('\r')
             self.considerError(lastError)
@@ -276,24 +274,34 @@ class BootOMetaGrammar(GrammarBase):
         self.considerError(lastError)
         _G_apply_2, lastError = self.apply("token", _G_python_1)
         self.considerError(lastError)
-        def _G_or_3():
-            _G_apply_1, lastError = self.apply("escapedChar", )
+        def _G_many_3():
+            def _G_or_1():
+                _G_apply_1, lastError = self.apply("escapedChar", )
+                self.considerError(lastError)
+                return (_G_apply_1, self.currentError)
+            def _G_or_2():
+                def _G_not_1():
+                    _G_exactly_1, lastError = self.exactly("'")
+                    self.considerError(lastError)
+                    return (_G_exactly_1, self.currentError)
+                _G_not_2, lastError = self._not(_G_not_1)
+                self.considerError(lastError)
+                _G_apply_3, lastError = self.apply("anything", )
+                self.considerError(lastError)
+                return (_G_apply_3, self.currentError)
+            _G_or_3, lastError = self._or([_G_or_1, _G_or_2])
             self.considerError(lastError)
-            return (_G_apply_1, self.currentError)
-        def _G_or_4():
-            _G_apply_1, lastError = self.apply("anything", )
-            self.considerError(lastError)
-            return (_G_apply_1, self.currentError)
-        _G_or_5, lastError = self._or([_G_or_3, _G_or_4])
+            return (_G_or_3, self.currentError)
+        _G_many_4, lastError = self.many(_G_many_3)
         self.considerError(lastError)
-        _locals['c'] = _G_or_5
-        _G_python_6, lastError = eval('"\'"', self.globals, _locals), None
+        _locals['c'] = _G_many_4
+        _G_python_5, lastError = eval('"\'"', self.globals, _locals), None
         self.considerError(lastError)
-        _G_apply_7, lastError = self.apply("token", _G_python_6)
+        _G_apply_6, lastError = self.apply("token", _G_python_5)
         self.considerError(lastError)
-        _G_python_8, lastError = eval('self.builder.exactly(c)', self.globals, _locals), None
+        _G_python_7, lastError = eval("self.builder.exactly(''.join(c))", self.globals, _locals), None
         self.considerError(lastError)
-        return (_G_python_8, self.currentError)
+        return (_G_python_7, self.currentError)
 
 
     def rule_string(self):
@@ -328,7 +336,7 @@ class BootOMetaGrammar(GrammarBase):
         self.considerError(lastError)
         _G_apply_6, lastError = self.apply("token", _G_python_5)
         self.considerError(lastError)
-        _G_python_7, lastError = eval("self.builder.exactly(''.join(c))", self.globals, _locals), None
+        _G_python_7, lastError = eval("self.builder.match_string(''.join(c))", self.globals, _locals), None
         self.considerError(lastError)
         return (_G_python_7, self.currentError)
 

@@ -457,6 +457,19 @@ class OMetaBase(object):
             self.input = m
 
 
+    def match_string(self, tok):
+        """
+        Match and return the given string, consuming any preceding whitespace.
+        """
+        m = self.input
+        try:
+            for c in tok:
+                v, e = self.exactly(c)
+            return tok, e
+        except ParseError:
+            self.input = m
+            raise
+
     def token(self, tok):
         """
         Match and return the given string, consuming any preceding whitespace.

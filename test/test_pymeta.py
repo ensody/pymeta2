@@ -1,7 +1,7 @@
 from textwrap import dedent
 from twisted.trial import unittest
 from pymeta.runtime import ParseError, OMetaBase, EOFError
-from pymeta.boot import BootOMetaGrammar
+from pymeta.grammar import OMetaGrammar
 from pymeta.builder import TreeBuilder, moduleFromGrammar
 
 class HandyWrapper(object):
@@ -45,7 +45,7 @@ class OMetaTestCase(unittest.TestCase):
     Tests of OMeta grammar compilation.
     """
 
-    classTested = BootOMetaGrammar
+    classTested = OMetaGrammar
 
     def compile(self, grammar):
         """
@@ -343,14 +343,23 @@ class OMetaTestCase(unittest.TestCase):
         self.assertEqual(g.interp([[u'3', u'+', [u'5', u'*', u'2']]]), 13)
 
 
-    def test_string(self):
+    def test_string_object(self):
         """
         Strings in double quotes match string objects.
         """
         g = self.compile("""
-             interp = ["Foo" 1 2] -> 3
+             interp = ['Foo' 1 2] -> 3
            """)
         self.assertEqual(g.interp([["Foo", 1, 2]]), 3)
+
+    def test_match_string(self):
+        """
+        Strings in double quotes match string objects.
+        """
+        g = self.compile("""
+             interp = "Foo" 1 2 -> 3
+           """)
+        self.assertEqual(g.interp(['F', 'o', 'o', 1, 2]), 3)
 
     def test_argEscape(self):
         """

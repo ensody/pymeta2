@@ -30,7 +30,7 @@ class OMeta(OMetaBase):
 
 ometaGrammar = r"""
 hspace = (' ' | '\t')
-vspace = (token("\r\n") | '\r' | '\n')
+vspace = ("\r\n" | '\r' | '\n')
 emptyline = hspace* vspace
 indentation = emptyline* hspace+
 noindentation = emptyline* ~~~hspace
@@ -52,9 +52,9 @@ escapedChar = '\\' ('n' -> "\n"
                      |'\'' -> "'"
                      |'\\' -> "\\")
 
-character = token("'") (escapedChar | anything):c token("'") -> self.builder.exactly(c)
+character = token("'") (escapedChar | ~('\'') anything)*:c token("'") -> self.builder.exactly(''.join(c))
 
-string = token('"') (escapedChar | ~('"') anything)*:c token('"') -> self.builder.exactly(''.join(c))
+string = token('"') (escapedChar | ~('"') anything)*:c token('"') -> self.builder.match_string(''.join(c))
 
 name = letter:x letterOrDigit*:xs !(xs.insert(0, x)) -> ''.join(xs)
 
@@ -117,25 +117,26 @@ class OMetaGrammar(BootBaseTraits, OMeta.makeGrammar(ometaGrammar, globals())):
 
 OMeta.metagrammarClass = OMetaGrammar
 
-nullOptimizationGrammar = """
+nullOptimizationGrammar = r"""
 
-opt = ( ["Apply" :ruleName :codeName [anything*:exprs]] -> self.builder.apply(ruleName, codeName, *exprs)
-      | ["Exactly" :expr]       -> self.builder.exactly(expr)
-      | ["Many" opt:expr]       -> self.builder.many(expr)
-      | ["Many1" opt:expr]      -> self.builder.many1(expr)
-      | ["Optional" opt:expr]   -> self.builder.optional(expr)
-      | ["Or" [opt*:exprs]]     -> self.builder._or(exprs)
-      | ["And" [opt*:exprs]]    -> self.builder.sequence(exprs)
-      | ["Not" opt:expr]        -> self.builder._not(expr)
-      | ["Lookahead" opt:expr]  -> self.builder.lookahead(expr)
-      | ["Bind" :name opt:expr] -> self.builder.bind(expr, name)
-      | ["Predicate" opt:expr]  -> self.builder.pred(expr)
-      | ["Action" :code]        -> self.builder.action(code)
-      | ["Python" :code]        -> self.builder.expr(code)
-      | ["List" opt:exprs]      -> self.builder.listpattern(exprs)
+opt = ( ['Apply' :ruleName :codeName [anything*:exprs]] -> self.builder.apply(ruleName, codeName, *exprs)
+      | ['Exactly' :expr]       -> self.builder.exactly(expr)
+      | ['MatchString' :expr]       -> self.builder.match_string(expr)
+      | ['Many' opt:expr]       -> self.builder.many(expr)
+      | ['Many1' opt:expr]      -> self.builder.many1(expr)
+      | ['Optional' opt:expr]   -> self.builder.optional(expr)
+      | ['Or' [opt*:exprs]]     -> self.builder._or(exprs)
+      | ['And' [opt*:exprs]]    -> self.builder.sequence(exprs)
+      | ['Not' opt:expr]        -> self.builder._not(expr)
+      | ['Lookahead' opt:expr]  -> self.builder.lookahead(expr)
+      | ['Bind' :name opt:expr] -> self.builder.bind(expr, name)
+      | ['Predicate' opt:expr]  -> self.builder.pred(expr)
+      | ['Action' :code]        -> self.builder.action(code)
+      | ['Python' :code]        -> self.builder.expr(code)
+      | ['List' opt:exprs]      -> self.builder.listpattern(exprs)
       )
-grammar = ["Grammar" :name [rulePair*:rs]] -> self.builder.makeGrammar(rs)
-rulePair = ["Rule" :name opt:rule] -> self.builder.rule(name, rule)
+grammar = ['Grammar' :name [rulePair*:rs]] -> self.builder.makeGrammar(rs)
+rulePair = ['Rule' :name opt:rule] -> self.builder.rule(name, rule)
 
 """
 
