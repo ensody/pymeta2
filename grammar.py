@@ -33,7 +33,7 @@ hspace = (' ' | '\t')
 vspace = ("\r\n" | '\r' | '\n')
 emptyline = hspace* vspace
 indentation = emptyline* hspace+
-noindentation = emptyline* ~~~hspace
+noindentation = emptyline* ~hspace
 
 number = spaces ('-' barenumber:x -> self.builder.exactly(-x)
                     |barenumber:x -> self.builder.exactly(x))
