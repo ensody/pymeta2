@@ -284,6 +284,20 @@ class OMetaTestCase(unittest.TestCase):
         self.assertEqual(g.fact([3]), 6)
 
 
+    def test_apply_rule(self):
+        """
+        Productions can pattern-match on arguments even if they're lists.
+        """
+        g = self.compile("""
+              fact 0                    -> 1
+              fact :n = fact((n - 1)):m -> n * m
+              domany = interp*
+              interp = [:name apply(name):x] -> x
+           """)
+        self.assertEqual(g.interp([['domany', ['fact', 3], ['fact', 5]]]),
+                         [6, 120])
+
+
     def test_listpattern(self):
         """
         Brackets can be used to match contents of lists.
