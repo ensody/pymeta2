@@ -1,10 +1,15 @@
 syntax: glob
+build
+dist
+*.egg-info
+.project
+.pydevproject
+.settings
 *~
+*.orig
 *.pyc
 *.pyo
-*.tmp
 *.swp
-*.orig
+*.tmp
 desktop.ini
 nbproject
-boot_generated.py
