@@ -457,7 +457,7 @@ class OMetaBase(object):
 
     def match_string(self, tok):
         """
-        Match and return the given string, consuming any preceding whitespace.
+        Match and return the given string.
         """
         m = self.input
         try:
@@ -467,6 +467,7 @@ class OMetaBase(object):
         except ParseError:
             self.input = m
             raise
+    rule_match_string = match_string
 
     def token(self, tok):
         """
