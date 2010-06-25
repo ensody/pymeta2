@@ -1,6 +1,6 @@
 from textwrap import dedent
 from twisted.trial import unittest
-from pymeta.runtime import ParseError, OMetaBase, EOFError
+from pymeta.runtime import ParseError, OMetaBase, EOFError, expected
 from pymeta.grammar import OMetaGrammar
 from pymeta.builder import TreeBuilder, moduleFromGrammar
 
@@ -21,21 +21,21 @@ class HandyWrapper(object):
         rule.
         @param: Rule name.
         """
-        def doIt(str):
+        def doIt(s):
             """
-            @param str: The string to be parsed by the wrapped grammar.
+            @param s: The string to be parsed by the wrapped grammar.
             """
-            obj = self.klass(str)
+            obj = self.klass(s)
             ret, err = obj.apply(name)
             try:
-                extra, err = obj.input.head()
+                extra, _ = obj.input.head()
             except EOFError:
                 try:
                     return ''.join(ret)
                 except TypeError:
                     return ret
             else:
-                raise ParseError(err.args[0], err.args[1], "trailing garbage in input: %r" % (extra,))
+                raise err
         return doIt
 
 
@@ -78,7 +78,7 @@ class OMetaTestCase(unittest.TestCase):
                           aLetter = 'a'
                           """)
         self.assertEqual(g.digit("1"), "1")
-        self.assertRaises(ParseError, g.digit, "4")        
+        self.assertRaises(ParseError, g.digit, "4")
 
 
     def test_escapedLiterals(self):
@@ -385,6 +385,8 @@ class OMetaTestCase(unittest.TestCase):
             broken = trick | anything*
         """)
         self.assertEqual(g.broken('ab'), 'ab')
+
+
 
 class PyExtractorTest(unittest.TestCase):
     """

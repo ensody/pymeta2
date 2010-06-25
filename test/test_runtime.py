@@ -1,7 +1,7 @@
 
 
 from twisted.trial import unittest
-from pymeta.runtime import OMetaBase, ParseError, expected, expectedOneOf, eof
+from pymeta.runtime import OMetaBase, ParseError, expected, eof
 
 class RuntimeTests(unittest.TestCase):
     """
@@ -18,7 +18,7 @@ class RuntimeTests(unittest.TestCase):
 
         for i, c in enumerate(data):
             v, e = o.rule_anything()
-            self.assertEqual((c, i), (v, e.position))
+            self.assertEqual((c, i), (v, e[0]))
 
 
     def test_exactly(self):
@@ -31,7 +31,7 @@ class RuntimeTests(unittest.TestCase):
         o = OMetaBase(data)
         v, e = o.rule_exactly("f")
         self.assertEqual(v, "f")
-        self.assertEqual(e.position, 0)
+        self.assertEqual(e[0], 0)
 
     def test_exactlyFail(self):
         """
@@ -43,8 +43,8 @@ class RuntimeTests(unittest.TestCase):
         data = "foo"
         o = OMetaBase(data)
         e = self.assertRaises(ParseError, o.rule_exactly, "g")
-        self.assertEquals(e.error, expected("g"))
-        self.assertEquals(e.position, 0)
+        self.assertEquals(e[1], expected(None, "g"))
+        self.assertEquals(e[0], 0)
 
 
 
@@ -58,10 +58,10 @@ class RuntimeTests(unittest.TestCase):
         o = OMetaBase(data)
         v, e = o.rule_token("foo")
         self.assertEqual(v, "foo")
-        self.assertEqual(e.position, 4)
+        self.assertEqual(e[0], 4)
         v, e = o.rule_token("bar")
         self.assertEqual(v, "bar")
-        self.assertEqual(e.position, 8)
+        self.assertEqual(e[0], 8)
 
 
     def test_tokenFailed(self):
@@ -72,8 +72,8 @@ class RuntimeTests(unittest.TestCase):
         data = "foozle"
         o = OMetaBase(data)
         e = self.assertRaises(ParseError, o.rule_token, "fog")
-        self.assertEqual(e.position, 2)
-        self.assertEqual(e.error, expected("g"))
+        self.assertEqual(e[0], 2)
+        self.assertEqual(e[1], expected("token", "fog"))
 
 
     def test_many(self):
@@ -84,7 +84,7 @@ class RuntimeTests(unittest.TestCase):
 
         data = "ooops"
         o  = OMetaBase(data)
-        self.assertEqual(o.many(lambda: o.rule_exactly('o')), (['o'] * 3, ParseError(3, expected('o'))))
+        self.assertEqual(o.many(lambda: o.rule_exactly('o')), (['o'] * 3, ParseError(3, expected(None, 'o'))))
 
 
     def test_or(self):
@@ -107,7 +107,7 @@ class RuntimeTests(unittest.TestCase):
         v, e = o._or(matchers)
         self.assertEqual(called, [True, True, False])
         self.assertEqual(v, 'a')
-        self.assertEqual(e.position, 0)
+        self.assertEqual(e[0], 0)
 
 
     def test_orSimpleFailure(self):
@@ -123,8 +123,8 @@ class RuntimeTests(unittest.TestCase):
                               [lambda: o.token("fog"),
                                lambda: o.token("foozik"),
                                lambda: o.token("woozle")])
-        self.assertEqual(e.position, 4)
-        self.assertEqual(e.error, expected("i"))
+        self.assertEqual(e[0], 4)
+        self.assertEqual(e[1], expected("token",  "foozik"))
 
 
     def test_orFalseSuccess(self):
@@ -139,8 +139,8 @@ class RuntimeTests(unittest.TestCase):
         v, e = o._or( [lambda: o.token("fog"),
                                lambda: o.token("foozik"),
                                lambda: o.token("f")])
-        self.assertEqual(e.position, 4)
-        self.assertEqual(e.error, expected("i"))
+        self.assertEqual(e[0], 4)
+        self.assertEqual(e[1], expected("token", "foozik"))
 
     def test_orErrorTie(self):
         """
@@ -154,8 +154,8 @@ class RuntimeTests(unittest.TestCase):
         v, e = o._or( [lambda: o.token("fog"),
                                lambda: o.token("foz"),
                                lambda: o.token("f")])
-        self.assertEqual(e.position, 2)
-        self.assertEqual(e.error, expectedOneOf(["g", "z"]))
+        self.assertEqual(e[0], 2)
+        self.assertEqual(e[1], [expected("token", "fog")[0], expected("token", "foz")[0]])
 
 
     def test_notError(self):
@@ -166,8 +166,8 @@ class RuntimeTests(unittest.TestCase):
         data = "xy"
         o = OMetaBase(data)
         e = self.assertRaises(ParseError, o._not, lambda: o.exactly("x"))
-        self.assertEqual(e.position, 1)
-        self.assertEqual(e.error, None)
+        self.assertEqual(e[0], 1)
+        self.assertEqual(e[1], None)
 
 
     def test_spaces(self):
@@ -179,7 +179,7 @@ class RuntimeTests(unittest.TestCase):
         o = OMetaBase(data)
         v, e = o.rule_spaces()
 
-        self.assertEqual(e.position, 2)
+        self.assertEqual(e[0], 2)
 
     def test_predSuccess(self):
         """
@@ -210,7 +210,7 @@ class RuntimeTests(unittest.TestCase):
         e = self.assertRaises(ParseError, o.rule_end)
         self.assertEqual(e, ParseError(1, None))
         o.many(o.rule_anything)
-        self.assertEqual(o.rule_end(), (True, ParseError(3, None)))
+        self.assertEqual(o.rule_end(), (True, [3, None]))
 
 
     def test_letter(self):
@@ -220,7 +220,7 @@ class RuntimeTests(unittest.TestCase):
 
         o = OMetaBase("a1")
         v, e = o.rule_letter()
-        self.assertEqual((v, e), ("a", ParseError(0, None)))
+        self.assertEqual((v, e), ("a", [0, None]))
         e = self.assertRaises(ParseError, o.rule_letter)
         self.assertEqual(e, ParseError(1, expected("letter")))
 
@@ -231,9 +231,9 @@ class RuntimeTests(unittest.TestCase):
         """
         o = OMetaBase("a1@")
         v, e = o.rule_letterOrDigit()
-        self.assertEqual((v, e), ("a", ParseError(0, None)))
+        self.assertEqual((v, e), ("a", [0, None]))
         v, e = o.rule_letterOrDigit()
-        self.assertEqual((v, e), ("1", ParseError(1, None)))
+        self.assertEqual((v, e), ("1", [1, None]))
         e = self.assertRaises(ParseError, o.rule_letterOrDigit)
         self.assertEqual(e, ParseError(2, expected("letter or digit")))
 
@@ -244,7 +244,7 @@ class RuntimeTests(unittest.TestCase):
         """
         o = OMetaBase("1a")
         v, e = o.rule_digit()
-        self.assertEqual((v, e), ("1", ParseError(0, None)))
+        self.assertEqual((v, e), ("1", [0, None]))
         e = self.assertRaises(ParseError, o.rule_digit)
         self.assertEqual(e, ParseError(1, expected("digit")))
 
@@ -256,4 +256,4 @@ class RuntimeTests(unittest.TestCase):
         """
         o = OMetaBase([["a"]])
         v, e = o.listpattern(lambda: o.exactly("a"))
-        self.assertEqual((v, e), (["a"], ParseError(0, None)))
+        self.assertEqual((v, e), (["a"], [0, None]))
