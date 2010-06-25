@@ -27,6 +27,8 @@ class ParseError(Exception):
 
 
     def formatReason(self):
+        if self.error is None:
+            return ''
         if len(self.error) == 1:
             if self.error[0][2] == None:
                 return 'expected a ' + self.error[0][1]
