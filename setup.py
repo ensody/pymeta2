@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 import os
 
 DESCRIPTION = 'Parser generator'
@@ -10,7 +10,7 @@ except:
     pass
 
 setup(name='pymeta2',
-      packages=find_packages(),
+      packages=['pymeta'],
       author='Waldemar Kornewald',
       url='http://www.allbuttonspressed.com/projects/pymeta2',
       include_package_data=True,
