@@ -25,7 +25,6 @@ class ParseError(Exception):
         if other.__class__ == self.__class__:
             return (self.position, self.error) == (other.position, other.error)
 
-
     def formatReason(self):
         if self.error is None:
             return ''
@@ -53,20 +52,20 @@ class ParseError(Exception):
         """
         lines = input.split('\n')
         counter = 0
-        lineNo = 1
-        columnNo = 0
+        line_number = 1
+        column = 0
         for line in lines:
-            newCounter = counter + len(line)
-            if newCounter > self.position:
-                columnNo = self.position - counter
+            new_counter = counter + len(line)
+            if new_counter > self.position:
+                column = self.position - counter
                 break
             else:
                 counter += len(line) + 1
-                lineNo += 1
+                line_number += 1
         reason = self.formatReason()
-        return ('\n' + line + '\n' + (' ' * columnNo + '^') +
-                "\nParse error at line %s, column %s: %s\n" % (lineNo,
-                                                               columnNo,
+        return ('\n' + line + '\n' + (' ' * column + '^') +
+                "\nParse error at line %s, column %s: %s\n" % (line_number,
+                                                               column,
                                                                reason))
 
 class EOFError(ParseError):
@@ -261,9 +260,8 @@ class OMetaBase(object):
         self.currentError = self.input.nullError()
 
     def considerError(self, error):
-        if error and  error[0] > self.currentError[0]:
+        if error and error[1] and error[0] > self.currentError[0]:
             self.currentError = error
-
 
     def superApply(self, ruleName, *args):
         """
@@ -288,7 +286,6 @@ class OMetaBase(object):
         if r is not None:
             val, err = self._apply(r, ruleName, args)
             return val, ParseError(*err)
-
         else:
             raise NameError("No rule named '%s'" %(ruleName,))
     rule_apply = apply
