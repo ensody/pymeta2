@@ -18,8 +18,7 @@ class BootBaseTraits(object):
         except EOFError:
             pass
         else:
-            x = str(''.join(self.input.data[max(0, self.input.position-1):]))
-            raise ParseError(self.input.position, err, "Grammar parse failed.\nLeftover bits:\n%s" % x)
+            raise ParseError(self.input.position, err, "Grammar parse failed.\n%s" % self.currentError.formatError(''.join(self.input.data)))
         return res
 
     def applicationArgs(self):
