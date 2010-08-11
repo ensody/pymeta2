@@ -55,12 +55,12 @@ class ParseError(Exception):
         line_number = 1
         column = 0
         for line in lines:
-            new_counter = counter + len(line)
+            new_counter = counter + len(line) + 1
             if new_counter > self.position:
                 column = self.position - counter
                 break
             else:
-                counter += len(line) + 1
+                counter = new_counter
                 line_number += 1
         reason = self.formatReason()
         return ('\n' + line + '\n' + (' ' * column + '^') +
