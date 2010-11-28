@@ -2,11 +2,11 @@
 Public interface to OMeta, as well as the grammars used to compile grammar
 definitions.
 """
+from .builder import TreeBuilder, moduleFromGrammar
+from .boot import BootOMetaGrammar
+from .bootbase import BootBaseTraits
+from .runtime import OMetaBase
 import string
-from builder import TreeBuilder, moduleFromGrammar
-from boot import BootOMetaGrammar
-from bootbase import BootBaseTraits
-from runtime import OMetaBase, ParseError, EOFError
 
 class OMeta(OMetaBase):
     """

@@ -1,7 +1,6 @@
-from textwrap import dedent
-from twisted.trial import unittest
-
 from pymeta.builder import TreeBuilder, writePython as writePython_orig
+from textwrap import dedent
+import unittest
 
 def dd(txt):
     return dedent(txt).strip()
@@ -13,8 +12,6 @@ class PythonWriterTests(unittest.TestCase):
     """
     Tests for generating Python source from an AST.
     """
-
-
     def setUp(self):
         """
         Create a L{PythonBuilder}.

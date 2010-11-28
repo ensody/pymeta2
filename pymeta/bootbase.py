@@ -1,5 +1,4 @@
-import string
-from pymeta.runtime import OMetaBase, ParseError, EOFError
+from .runtime import OMetaBase, _MaybeParseError, EOFError
 
 class BootBaseTraits(object):
     def parseGrammar(self, name, builder, *args):
@@ -18,7 +17,7 @@ class BootBaseTraits(object):
         except EOFError:
             pass
         else:
-            raise ParseError(self.input.position, err, "Grammar parse failed.\n%s" % self.currentError.formatError(''.join(self.input.data)))
+            raise _MaybeParseError(self.input.position, err, "Grammar parse failed.\n%s" % self.currentError.formatError(''.join(self.input.data)))
         return res
 
     def applicationArgs(self):
@@ -35,13 +34,13 @@ class BootBaseTraits(object):
                 args.append(self.builder.expr(arg))
                 if endchar == ')':
                     break
-            except ParseError:
+            except _MaybeParseError:
                 break
         if args:
             return args
         else:
             x = str(''.join(self.input.data[max(0, self.input.position-1):]))
-            raise ParseError(self.input.position, None, "Grammar parse failed.\nLeftover bits:\n%s" % x)
+            raise _MaybeParseError(self.input.position, None, "Grammar parse failed.\nLeftover bits:\n%s" % x)
 
     def ruleValueExpr(self):
         """

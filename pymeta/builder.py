@@ -1,8 +1,6 @@
 # -*- test-case-name: pymeta.test.test_builder -*-
-import linecache, sys
 from types import ModuleType as module
-
-import itertools, linecache, sys
+import linecache, sys
 
 class TreeBuilder(object):
     """
@@ -318,8 +316,6 @@ class GeneratedCodeLoader(object):
         self.source = source
     def get_source(self, name):
         return self.source
-
-
 
 def moduleFromGrammar(tree, className, superclass, globalsDict):
     source = writePython(tree)
