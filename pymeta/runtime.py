@@ -3,7 +3,13 @@
 Code needed to run a grammar after it has been compiled.
 """
 import operator
+
+# The public parse error
 class ParseError(Exception):
+    pass
+
+# The internal ParseError
+class _MaybeParseError(Exception):
     """
     ?Redo from start
     """
@@ -68,9 +74,9 @@ class ParseError(Exception):
                                                                column,
                                                                reason))
 
-class EOFError(ParseError):
+class EOFError(_MaybeParseError):
     def __init__(self, position):
-        ParseError.__init__(self, position, eof())
+        _MaybeParseError.__init__(self, position, eof())
 
 
 def expected(typ, val=None):
@@ -259,6 +265,14 @@ class OMetaBase(object):
 
         self.currentError = self.input.nullError()
 
+    @classmethod
+    def parse(cls, source):
+        try:
+            parser = cls(source)
+            return parser.apply('grammar')[0]
+        except _MaybeParseError:
+            raise ParseError(parser.currentError.formatError(source))
+
     def considerError(self, error):
         if error and error[1] and error[0] > self.currentError[0]:
             self.currentError = error
@@ -285,7 +299,7 @@ class OMetaBase(object):
         r = getattr(self, "rule_"+ruleName, None)
         if r is not None:
             val, err = self._apply(r, ruleName, args)
-            return val, ParseError(*err)
+            return val, _MaybeParseError(*err)
         else:
             raise NameError("No rule named '%s'" %(ruleName,))
     rule_apply = apply
@@ -314,7 +328,7 @@ class OMetaBase(object):
             try:
                 memoRec = self.input.setMemo(ruleName,
                                              [rule(), self.input])
-            except ParseError:
+            except _MaybeParseError:
                 #print "Failed", rule
                 raise
             #print "Success", rule
@@ -329,13 +343,13 @@ class OMetaBase(object):
 
                         memoRec = oldPosition.setMemo(ruleName,
                                                      [ans, self.input])
-                    except ParseError:
+                    except _MaybeParseError:
                         break
             self.input = oldPosition
 
         elif isinstance(memoRec, LeftRecursion):
             memoRec.detected = True
-            raise ParseError(None, None)
+            raise _MaybeParseError(None, None)
         self.input = memoRec[1]
         return memoRec[0]
 
@@ -361,7 +375,7 @@ class OMetaBase(object):
             return val, p
         else:
             self.input = i
-            raise ParseError(p[0], expected(None, wanted))
+            raise _MaybeParseError(p[0], expected(None, wanted))
 
     rule_exactly = exactly
 
@@ -381,7 +395,7 @@ class OMetaBase(object):
                 m = self.input
                 v, _ = fn()
                 ans.append(v)
-            except ParseError, e:
+            except _MaybeParseError, e:
                 self.input = m
                 break
         return ans, e
@@ -400,26 +414,26 @@ class OMetaBase(object):
                 ret, err = f()
                 errors.append(err)
                 return ret, joinErrors(errors)
-            except ParseError, e:
+            except _MaybeParseError, e:
                 errors.append(e)
                 self.input = m
-        raise ParseError(*joinErrors(errors))
+        raise _MaybeParseError(*joinErrors(errors))
 
 
     def _not(self, fn):
         """
-        Call the given function. Raise ParseError iff it does not.
+        Call the given function. Raise _MaybeParseError iff it does not.
 
         @param fn: A callable of no arguments.
         """
         m = self.input
         try:
             fn()
-        except ParseError, e:
+        except _MaybeParseError, e:
             self.input = m
             return True, self.input.nullError()
         else:
-            raise ParseError(*self.input.nullError())
+            raise _MaybeParseError(*self.input.nullError())
 
     def eatWhitespace(self):
         """
@@ -441,13 +455,13 @@ class OMetaBase(object):
 
     def pred(self, expr):
         """
-        Call the given function, raising ParseError if it returns false.
+        Call the given function, raising _MaybeParseError if it returns false.
 
         @param expr: A callable of no arguments.
         """
         val, e = expr()
         if not val:
-            raise ParseError(*e)
+            raise _MaybeParseError(*e)
         else:
             return True, e
 
@@ -465,7 +479,7 @@ class OMetaBase(object):
         except TypeError:
             e = self.input.nullError()
             e[1] = expected("an iterable")
-            raise ParseError(*e)
+            raise _MaybeParseError(*e)
         expr()
         self.end()
         self.input = oldInput
@@ -504,9 +518,9 @@ class OMetaBase(object):
             for c in tok:
                 v, e = self.exactly(c)
             return tok, e
-        except ParseError, e:
+        except _MaybeParseError, e:
             self.input = m
-            raise ParseError(e[0], expected("string", tok))
+            raise _MaybeParseError(e[0], expected("string", tok))
     rule_match_string = match_string
 
     def token(self, tok):
@@ -519,10 +533,10 @@ class OMetaBase(object):
             for c in tok:
                 v, e = self.exactly(c)
             return tok, e
-        except ParseError, e:
+        except _MaybeParseError, e:
             self.input = m
             
-            raise ParseError(e[0], expected("token", tok))
+            raise _MaybeParseError(e[0], expected("token", tok))
 
     rule_token = token
 
@@ -535,7 +549,7 @@ class OMetaBase(object):
             return x, e
         else:
             e[1] = expected("letter")
-            raise ParseError(*e)
+            raise _MaybeParseError(*e)
 
     rule_letter = letter
 
@@ -548,7 +562,7 @@ class OMetaBase(object):
             return x, e
         else:
             e[1] = expected("letter or digit")
-            raise ParseError(*e)
+            raise _MaybeParseError(*e)
 
     rule_letterOrDigit = letterOrDigit
 
@@ -561,7 +575,7 @@ class OMetaBase(object):
             return x, e
         else:
             e[1] = expected("digit")
-            raise ParseError(*e)
+            raise _MaybeParseError(*e)
 
     rule_digit = digit
 
@@ -580,7 +594,7 @@ class OMetaBase(object):
         while True:
             try:
                 c, e = self.rule_anything()
-            except ParseError, e:
+            except _MaybeParseError, e:
                 endchar = None
                 break
             if c in endChars and len(stack) == 0:
@@ -593,7 +607,7 @@ class OMetaBase(object):
                 elif len(stack) > 0 and c == stack[-1]:
                     stack.pop()
                 elif c in delimiters.values():
-                    raise ParseError(self.input.position, expected("Python expression"))
+                    raise _MaybeParseError(self.input.position, expected("Python expression"))
                 elif c in "\"'":
                     while True:
                         strc, stre = self.rule_anything()
@@ -605,7 +619,7 @@ class OMetaBase(object):
                             slashcount += 1
                         if strc == c and slashcount % 2 == 0:
                             break
-            
+
         if len(stack) > 0:
-            raise ParseError(self.input.position, expected("Python expression"))
+            raise _MaybeParseError(self.input.position, expected("Python expression"))
         return (''.join(expr).strip(), endchar), e
