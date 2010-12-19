@@ -1,4 +1,4 @@
-from .runtime import OMetaBase, _MaybeParseError, EOFError
+from .runtime import OMetaBase, _MaybeParseError, ParseError, EOFError
 
 class BootBaseTraits(object):
     def parseGrammar(self, name, builder, *args):
@@ -17,7 +17,7 @@ class BootBaseTraits(object):
         except EOFError:
             pass
         else:
-            raise _MaybeParseError(self.input.position, err, "Grammar parse failed.\n%s" % self.currentError.formatError(''.join(self.input.data)))
+            raise ParseError("Grammar parse failed.\n%s" % self.currentError.formatError(''.join(self.input.data)))
         return res
 
     def applicationArgs(self):

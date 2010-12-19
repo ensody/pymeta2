@@ -35,7 +35,9 @@ class _MaybeParseError(Exception):
         if self.error is None:
             return ''
         if len(self.error) == 1:
-            if self.error[0][2] == None:
+            if self.error[0][0] == 'message':
+                return self.error[0][1]
+            elif self.error[0][2] == None:
                 return 'expected a ' + self.error[0][1]
             else:
                 return 'expected the %s %s' % (self.error[0][1], self.error[0][2])
@@ -274,8 +276,10 @@ class OMetaBase(object):
             raise ParseError(parser.currentError.formatError(source))
 
     def considerError(self, error):
+        if isinstance(error, _MaybeParseError):
+            error = error.args
         if error and error[1] and error[0] > self.currentError[0]:
-            self.currentError = error
+            self.currentError = _MaybeParseError(*error)
 
     def superApply(self, ruleName, *args):
         """
