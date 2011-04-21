@@ -269,6 +269,8 @@ class OMetaBase(object):
 
     @classmethod
     def parse(cls, source):
+        if isinstance(source, str):
+            source = source.decode('utf8')
         try:
             parser = cls(source)
             return parser.apply('grammar')[0]
