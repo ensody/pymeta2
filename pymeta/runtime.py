@@ -168,7 +168,7 @@ class InputStream(object):
         return self.data[self.position], [self.position, None]
 
     def nullError(self):
-        return [self.position, None]
+        return _MaybeParseError(self.position, None)
 
     def tail(self):
         if self.tl is None:
