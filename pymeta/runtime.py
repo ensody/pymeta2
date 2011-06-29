@@ -172,11 +172,11 @@ class InputStream(object):
 
     def tail(self):
         if self.tl is None:
-            self.tl = InputStream(self.data, self.position+1)
+            self.tl = InputStream(self.data, self.position + 1)
         return self.tl
 
     def prev(self):
-        return InputStream(self.data, self.position-1)
+        return InputStream(self.data, self.position - 1)
 
     def getMemo(self, name):
         """
@@ -204,20 +204,13 @@ class ArgInput(object):
         self.err = parent.nullError()
 
     def head(self):
-        try:
-            x = self.arg
-        except:
-            import pdb; pdb. set_trace()
         return self.arg, self.err
 
     def tail(self):
         return self.parent
 
-
-
     def nullError(self):
         return self.parent.nullError()
-
 
     def getMemo(self, name):
         """
@@ -225,7 +218,6 @@ class ArgInput(object):
         @param name: A rule name.
         """
         return self.memo.get(name, None)
-
 
     def setMemo(self, name, rec):
         """
@@ -289,12 +281,12 @@ class OMetaBase(object):
 
         @param ruleName: A rule name.
         """
-        r = getattr(super(self.__class__, self), "rule_"+ruleName, None)
+        r = getattr(super(self.__class__, self), "rule_" + ruleName, None)
         if r is not None:
             self.input.setMemo(ruleName, None)
             return self._apply(r, ruleName, args)
         else:
-            raise NameError("No rule named '%s'" %(ruleName,))
+            raise NameError("No rule named '%s'" % (ruleName,))
 
     def apply(self, ruleName, *args):
         """
@@ -302,12 +294,12 @@ class OMetaBase(object):
 
         @param ruleName: A rule name.
         """
-        r = getattr(self, "rule_"+ruleName, None)
+        r = getattr(self, "rule_" + ruleName, None)
         if r is not None:
             val, err = self._apply(r, ruleName, args)
             return val, _MaybeParseError(*err)
         else:
-            raise NameError("No rule named '%s'" %(ruleName,))
+            raise NameError("No rule named '%s'" % (ruleName,))
     rule_apply = apply
 
     def _apply(self, rule, ruleName, args):
@@ -435,7 +427,7 @@ class OMetaBase(object):
         m = self.input
         try:
             fn()
-        except _MaybeParseError, e:
+        except _MaybeParseError:
             self.input = m
             return True, self.input.nullError()
         else:
@@ -539,7 +531,6 @@ class OMetaBase(object):
             return tok, e
         except _MaybeParseError, e:
             self.input = m
-            
             raise _MaybeParseError(e[0], expected("token", tok))
 
     rule_token = token
@@ -590,10 +581,9 @@ class OMetaBase(object):
 
         @arg endChars: A set of characters delimiting the end of the expression.
         """
-        delimiters = { "(": ")", "[": "]", "{": "}"}
+        delimiters = {"(": ")", "[": "]", "{": "}"}
         stack = []
         expr = []
-        lastc = None
         endchar = None
         while True:
             try:
@@ -611,7 +601,8 @@ class OMetaBase(object):
                 elif len(stack) > 0 and c == stack[-1]:
                     stack.pop()
                 elif c in delimiters.values():
-                    raise _MaybeParseError(self.input.position, expected("Python expression"))
+                    raise _MaybeParseError(self.input.position,
+                                           expected("Python expression"))
                 elif c in "\"'":
                     while True:
                         strc, stre = self.rule_anything()
