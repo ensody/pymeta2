@@ -483,9 +483,7 @@ class OMetaBase(object):
         try:
             self.input = InputStream.fromIterable(v)
         except TypeError:
-            e = self.input.nullError()
-            e[1] = expected("an iterable")
-            raise _MaybeParseError(*e)
+            raise _MaybeParseError(*(tuple(e)[:1] + tuple(expected("an iterable"))))
         expr()
         self.end()
         self.input = oldInput
