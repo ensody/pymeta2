@@ -8,7 +8,8 @@ class RuntimeTests(unittest.TestCase):
 
     def test_anything(self):
         """
-        L{OMetaBase.rule_anything} returns each item from the input along with its position.
+        L{OMetaBase.rule_anything} returns each item from the input along with
+        its position.
         """
 
         data = "foo"
@@ -88,8 +89,9 @@ class RuntimeTests(unittest.TestCase):
         """
 
         data = "ooops"
-        o  = OMetaBase(data)
-        self.assertEqual(o.many(lambda: o.rule_exactly('o')), (['o'] * 3, _MaybeParseError(3, expected(None, 'o'))))
+        o = OMetaBase(data)
+        self.assertEqual(o.many(lambda: o.rule_exactly('o')),
+                         (['o'] * 3, _MaybeParseError(3, expected(None, 'o'))))
 
 
     def test_or(self):
@@ -130,7 +132,7 @@ class RuntimeTests(unittest.TestCase):
                    lambda: o.token("woozle")])
         except _MaybeParseError, e:
             self.assertEqual(e[0], 4)
-            self.assertEqual(e[1], expected("token",  "foozik"))
+            self.assertEqual(e[1], expected("token", "foozik"))
         else:
             self.fail('_MaybeParseError not raised')
 
@@ -144,9 +146,9 @@ class RuntimeTests(unittest.TestCase):
         data = "foozle"
         o = OMetaBase(data)
 
-        v, e = o._or( [lambda: o.token("fog"),
-                               lambda: o.token("foozik"),
-                               lambda: o.token("f")])
+        v, e = o._or([lambda: o.token("fog"),
+                      lambda: o.token("foozik"),
+                      lambda: o.token("f")])
         self.assertEqual(e[0], 4)
         self.assertEqual(e[1], expected("token", "foozik"))
 
@@ -159,16 +161,17 @@ class RuntimeTests(unittest.TestCase):
         data = "foozle"
         o = OMetaBase(data)
 
-        v, e = o._or( [lambda: o.token("fog"),
-                               lambda: o.token("foz"),
-                               lambda: o.token("f")])
+        v, e = o._or([lambda: o.token("fog"),
+                      lambda: o.token("foz"),
+                      lambda: o.token("f")])
         self.assertEqual(e[0], 2)
         self.assertEqual(e[1], [expected("token", "fog")[0], expected("token", "foz")[0]])
 
 
     def test_notError(self):
         """
-        When L{OMetaBase._not} fails, its error contains the current input position and no error info.
+        When L{OMetaBase._not} fails, its error contains the current input position
+        and no error info.
         """
 
         data = "xy"
@@ -230,7 +233,7 @@ class RuntimeTests(unittest.TestCase):
         else:
             self.fail('_MaybeParseError not raised')
         o.many(o.rule_anything)
-        self.assertEqual(o.rule_end(), (True, [3, None]))
+        self.assertEqual(o.rule_end(), (True, _MaybeParseError(3, None)))
 
 
     def test_letter(self):

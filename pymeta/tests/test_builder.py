@@ -44,15 +44,16 @@ class PythonWriterTests(unittest.TestCase):
         x = self.builder.expr("x")
         a = self.builder.apply("foo", "main", one, x)
         self.assertEqual(writePython(a),
-                         dd("""
-                            _G_python_1, lastError = eval('1', self.globals, _locals), None
-                            self.considerError(lastError)
-                            _G_python_2, lastError = eval('x', self.globals, _locals), None
-                            self.considerError(lastError)
-                            _G_apply_3, lastError = self._apply(self.rule_foo, "foo", [_G_python_1, _G_python_2])
-                            self.considerError(lastError)
-                            _G_apply_3
-                            """))
+            dd("""
+               _G_python_1, lastError = eval('1', self.globals, _locals), None
+               self.considerError(lastError)
+               _G_python_2, lastError = eval('x', self.globals, _locals), None
+               self.considerError(lastError)
+               _G_apply_3, lastError = self._apply("""
+                    """self.rule_foo, "foo", [_G_python_1, _G_python_2])
+               self.considerError(lastError)
+               _G_apply_3
+               """))
 
 
 
@@ -65,15 +66,15 @@ class PythonWriterTests(unittest.TestCase):
         x = self.builder.expr("x")
         a = self.builder.apply("super", "main", one, x)
         self.assertEqual(writePython(a),
-                         dd("""
-                            _G_python_1, lastError = eval('1', self.globals, _locals), None
-                            self.considerError(lastError)
-                            _G_python_2, lastError = eval('x', self.globals, _locals), None
-                            self.considerError(lastError)
-                            _G_apply_3, lastError = self.superApply("main", _G_python_1, _G_python_2)
-                            self.considerError(lastError)
-                            _G_apply_3
-                            """))
+            dd("""
+               _G_python_1, lastError = eval('1', self.globals, _locals), None
+               self.considerError(lastError)
+               _G_python_2, lastError = eval('x', self.globals, _locals), None
+               self.considerError(lastError)
+               _G_apply_3, lastError = self.superApply("main", _G_python_1, _G_python_2)
+               self.considerError(lastError)
+               _G_apply_3
+               """))
 
 
     def test_many(self):
@@ -256,11 +257,11 @@ class PythonWriterTests(unittest.TestCase):
         """
         x = self.builder.action("doStuff()")
         self.assertEqual(writePython(x),
-                         dd("""
-                            _G_python_1, lastError = eval('doStuff()', self.globals, _locals), None
-                            self.considerError(lastError)
-                            _G_python_1
-                            """))
+            dd("""
+               _G_python_1, lastError = eval('doStuff()', self.globals, _locals), None
+               self.considerError(lastError)
+               _G_python_1
+               """))
 
 
     def test_expr(self):
@@ -268,12 +269,13 @@ class PythonWriterTests(unittest.TestCase):
         Test code generation for semantic predicates.
         """
         x = self.builder.expr("returnStuff()")
-        self.assertEqual(writePython(x),
-                         dd("""
-                            _G_python_1, lastError = eval('returnStuff()', self.globals, _locals), None
-                            self.considerError(lastError)
-                            _G_python_1
-                            """))
+        code = dd(
+            """
+            _G_python_1, lastError = eval('returnStuff()', self.globals, _locals), None
+            self.considerError(lastError)
+            _G_python_1
+            """)
+        self.assertEqual(writePython(x), code)
 
     def test_listpattern(self):
         """
@@ -281,15 +283,15 @@ class PythonWriterTests(unittest.TestCase):
         """
         x = self.builder.listpattern(self.builder.exactly("x"))
         self.assertEqual(writePython(x),
-                         dd("""
-                            def _G_listpattern_1():
-                                _G_exactly_1, lastError = self.exactly('x')
-                                self.considerError(lastError)
-                                return (_G_exactly_1, self.currentError)
-                            _G_listpattern_2, lastError = self.listpattern(_G_listpattern_1)
-                            self.considerError(lastError)
-                            _G_listpattern_2
-                            """))
+            dd("""
+               def _G_listpattern_1():
+                   _G_exactly_1, lastError = self.exactly('x')
+                   self.considerError(lastError)
+                   return (_G_exactly_1, self.currentError)
+               _G_listpattern_2, lastError = self.listpattern(_G_listpattern_1)
+               self.considerError(lastError)
+               _G_listpattern_2
+               """))
 
 
     def test_rule(self):

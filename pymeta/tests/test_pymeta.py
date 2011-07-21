@@ -1,6 +1,6 @@
 from pymeta.builder import TreeBuilder, moduleFromGrammar
 from pymeta.grammar import OMetaGrammar
-from pymeta.runtime import _MaybeParseError, OMetaBase, EOFError, expected
+from pymeta.runtime import _MaybeParseError, OMetaBase, EOFError
 from textwrap import dedent
 import unittest
 
@@ -125,7 +125,7 @@ class OMetaTestCase(unittest.TestCase):
         Input matches can be made on a sequence of patterns.
         """
         g = self.compile("twelve = '1' '2'")
-        self.assertEqual(g.twelve("12"), "2");
+        self.assertEqual(g.twelve("12"), "2")
         self.assertRaises(_MaybeParseError, g.twelve, "1")
 
 
@@ -244,7 +244,8 @@ class OMetaTestCase(unittest.TestCase):
         Python expressions can be run as actions with no effect on the result
         of the parse.
         """
-        g = self.compile("""foo = ('1'*:ones !(False) !(ones.insert(0, '0')) -> ''.join(ones))""")
+        g = self.compile("""foo = ('1'*:ones !(False) !(ones.insert(0, '0'))
+                                   -> ''.join(ones))""")
         self.assertEqual(g.foo("111"), "0111")
 
 
@@ -332,16 +333,16 @@ class OMetaTestCase(unittest.TestCase):
 
 
     def test_leftrecursion(self):
-         """
-         Left-recursion is detected and compiled appropriately.
-         """
-         g = self.compile("""
-               num = (num:n digit:d   -> n * 10 + d
-                      | digit)
-               digit = :x ?(x.isdigit()) -> int(x)
-              """)
-         self.assertEqual(g.num("3"), 3)
-         self.assertEqual(g.num("32767"), 32767)
+        """
+        Left-recursion is detected and compiled appropriately.
+        """
+        g = self.compile("""
+                         num = (num:n digit:d   -> n * 10 + d
+                             | digit)
+                         digit = :x ?(x.isdigit()) -> int(x)
+                         """)
+        self.assertEqual(g.num("3"), 3)
+        self.assertEqual(g.num("32767"), 32767)
 
 
     def test_characterVsSequence(self):
@@ -439,7 +440,7 @@ class MakeGrammarTest(unittest.TestCase):
         num = (num:n digit:d !(results.append(True)) -> n * 10 + d
                | digit)
         """)
-        TestGrammar = OMeta.makeGrammar(grammar, {'results':results})
+        TestGrammar = OMeta.makeGrammar(grammar, {'results': results})
         g = TestGrammar("314159")
         self.assertEqual(g.apply("num")[0], 314159)
         self.assertNotEqual(len(results), 0)
@@ -511,7 +512,7 @@ class NullOptimizerTest(OMetaTestCase):
         """
         from pymeta.grammar import OMetaGrammar, NullOptimizer
         g = OMetaGrammar(dedent(grammar))
-        tree  = g.parseGrammar('TestGrammar', TreeBuilder)
+        tree = g.parseGrammar('TestGrammar', TreeBuilder)
         opt = NullOptimizer([tree])
         opt.builder = TreeBuilder("TestGrammar", opt)
         tree, err = opt.apply("grammar")
