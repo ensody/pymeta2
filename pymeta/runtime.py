@@ -58,6 +58,9 @@ class _MaybeParseError(Exception):
         """
         Return a pretty string containing error info about string parsing failure.
         """
+        reason = self.formatReason()
+        if not isinstance(input, basestring):
+            return ("Parse error at input %s: %s\n" % (input, reason))
         lines = input.split('\n')
         counter = 0
         line_number = 1
@@ -70,7 +73,6 @@ class _MaybeParseError(Exception):
             else:
                 counter = new_counter
                 line_number += 1
-        reason = self.formatReason()
         return ('\n' + line + '\n' + (' ' * column + '^') +
                 "\nParse error at line %s, column %s: %s\n" % (line_number,
                                                                column,
@@ -475,7 +477,7 @@ class OMetaBase(object):
         try:
             self.input = InputStream.fromIterable(v)
         except TypeError:
-            raise _MaybeParseError(*(tuple(e)[:1] + tuple(expected("an iterable"))))
+            raise _MaybeParseError(e[0], expected("an iterable"))
         expr()
         self.end()
         self.input = oldInput
