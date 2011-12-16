@@ -43,7 +43,7 @@ class RuntimeTests(unittest.TestCase):
         o = OMetaBase(data)
         try:
             o.rule_exactly("g")
-        except _MaybeParseError, e:
+        except _MaybeParseError as e:
             self.assertEquals(e[1], expected(None, "g"))
             self.assertEquals(e[0], 0)
         else:
@@ -75,7 +75,7 @@ class RuntimeTests(unittest.TestCase):
         o = OMetaBase(data)
         try:
             o.rule_token('fog')
-        except _MaybeParseError, e:
+        except _MaybeParseError as e:
             self.assertEqual(e[0], 2)
             self.assertEqual(e[1], expected("token", "fog"))
         else:
@@ -130,7 +130,7 @@ class RuntimeTests(unittest.TestCase):
             o._or([lambda: o.token("fog"),
                    lambda: o.token("foozik"),
                    lambda: o.token("woozle")])
-        except _MaybeParseError, e:
+        except _MaybeParseError as e:
             self.assertEqual(e[0], 4)
             self.assertEqual(e[1], expected("token", "foozik"))
         else:
@@ -178,7 +178,7 @@ class RuntimeTests(unittest.TestCase):
         o = OMetaBase(data)
         try:
             o._not(lambda: o.exactly("x"))
-        except _MaybeParseError, e:
+        except _MaybeParseError as e:
             self.assertEqual(e[0], 1)
             self.assertEqual(e[1], None)
         else:
@@ -214,7 +214,7 @@ class RuntimeTests(unittest.TestCase):
         o = OMetaBase("")
         try:
             o.pred(lambda: (False, _MaybeParseError(0, None)))
-        except _MaybeParseError, e:
+        except _MaybeParseError as e:
             self.assertEqual(e, _MaybeParseError(0, None))
         else:
             self.fail('_MaybeParseError not raised')
@@ -228,7 +228,7 @@ class RuntimeTests(unittest.TestCase):
         o = OMetaBase("abc")
         try:
             o.rule_end()
-        except _MaybeParseError, e:
+        except _MaybeParseError as e:
             self.assertEqual(e, _MaybeParseError(1, None))
         else:
             self.fail('_MaybeParseError not raised')
@@ -246,7 +246,7 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual((v, e), ("a", [0, None]))
         try:
             o.rule_letter()
-        except _MaybeParseError, e:
+        except _MaybeParseError as e:
             self.assertEqual(e, _MaybeParseError(1, expected("letter")))
         else:
             self.fail('_MaybeParseError not raised')
@@ -263,7 +263,7 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual((v, e), ("1", [1, None]))
         try:
             o.rule_letterOrDigit()
-        except _MaybeParseError, e:
+        except _MaybeParseError as e:
             self.assertEqual(e, _MaybeParseError(2, expected("letter or digit")))
         else:
             self.fail('_MaybeParseError not raised')
@@ -277,7 +277,7 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual((v, e), ("1", [0, None]))
         try:
             o.rule_digit()
-        except _MaybeParseError, e:
+        except _MaybeParseError as e:
             self.assertEqual(e, _MaybeParseError(1, expected("digit")))
         else:
             self.fail('_MaybeParseError not raised')

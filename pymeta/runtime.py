@@ -395,7 +395,7 @@ class OMetaBase(object):
                 m = self.input
                 v, _ = fn()
                 ans.append(v)
-            except _MaybeParseError, e:
+            except _MaybeParseError as e:
                 self.input = m
                 break
         return ans, e
@@ -414,7 +414,7 @@ class OMetaBase(object):
                 ret, err = f()
                 errors.append(err)
                 return ret, joinErrors(errors)
-            except _MaybeParseError, e:
+            except _MaybeParseError as e:
                 errors.append(e)
                 self.input = m
         raise _MaybeParseError(*joinErrors(errors))
@@ -442,7 +442,7 @@ class OMetaBase(object):
         while True:
             try:
                 c, e = self.input.head()
-            except EOFError, e:
+            except EOFError as e:
                 break
             t = self.input.tail()
             if c.isspace():
@@ -516,7 +516,7 @@ class OMetaBase(object):
             for c in tok:
                 v, e = self.exactly(c)
             return tok, e
-        except _MaybeParseError, e:
+        except _MaybeParseError as e:
             self.input = m
             raise _MaybeParseError(e[0], expected("string", tok))
     rule_match_string = match_string
@@ -531,7 +531,7 @@ class OMetaBase(object):
             for c in tok:
                 v, e = self.exactly(c)
             return tok, e
-        except _MaybeParseError, e:
+        except _MaybeParseError as e:
             self.input = m
             raise _MaybeParseError(e[0], expected("token", tok))
 
@@ -590,7 +590,7 @@ class OMetaBase(object):
         while True:
             try:
                 c, e = self.rule_anything()
-            except _MaybeParseError, e:
+            except _MaybeParseError as e:
                 endchar = None
                 break
             if c in endChars and len(stack) == 0:
