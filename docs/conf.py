@@ -40,8 +40,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = os.path.basename(os.path.dirname(__file__))
-copyright = u'2011, Waldemar Kornewald'
+project = os.path.basename(os.path.dirname(os.path.dirname(__file__)))
+copyright = u'its creator'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

@@ -1,15 +1,17 @@
-syntax: glob
-build
-dist
-*.egg-info
-.project
-.pydevproject
-.settings
-*~
-*.orig
-*.pyc
-*.pyo
-*.swp
-*.tmp
-desktop.ini
-nbproject
+syntax: regexp
+^build$
+^docs/_build$
+^dist$
+^[^/]*.egg-info$
+^\.project$
+^\.pydevproject$
+^\.settings$
+~$
+\.orig$
+\.pyc$
+\.pyo$
+\.swp$
+\.tmp$
+^_generated_
+desktop\.ini$
+^nbproject$

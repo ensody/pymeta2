@@ -1,2 +1,2 @@
-syntax: glob
-pymeta/tests/__init__.py
+syntax: regexp
+^pymeta/tests/__init__\.py$
