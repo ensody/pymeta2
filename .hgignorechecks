@@ -1,2 +1,2 @@
 syntax: regexp
-^pymeta/tests/__init__\.py$
+.*
