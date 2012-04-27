@@ -563,6 +563,19 @@ class OMetaBase(object):
 
     rule_letterOrDigit = letterOrDigit
 
+    def anychar(self, chars):
+        """
+        Match any of the given chars.
+        """
+        x, e = self.rule_anything()
+        if x in chars:
+            return x, e
+        else:
+            e[1] = expected("any of: %s" % chars)
+            raise _MaybeParseError(*e)
+
+    rule_anychar = anychar
+
     def digit(self):
         """
         Match a single digit.
