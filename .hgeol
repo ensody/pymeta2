@@ -1,7 +1,9 @@
 [patterns]
 .deps = native
+.dmrc = native
 .hgignore = native
 .hgeol = native
+.ignorechecks = native
 **.txt = native
 **.pyva = native
 **.py = native
