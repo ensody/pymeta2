@@ -7,6 +7,9 @@
 **.txt = native
 **.pyva = native
 **.py = native
+**.sass = native
+**.scss = native
+**.css = native
 **.ru = native
 **.c = native
 **.cpp = native
