@@ -4,8 +4,6 @@ syntax: regexp
 ^docs/_build$
 ^dist$
 ^[^/]*.egg-info$
-^\.project$
-^\.pydevproject$
 ^\.settings$
 ~$
 \.orig$
