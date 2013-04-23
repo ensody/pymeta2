@@ -6,6 +6,7 @@ syntax: regexp
 ^[^/]*.egg-info$
 ^\.settings$
 ~$
+\.bak$
 \.orig$
 \.pyc$
 \.pyo$
