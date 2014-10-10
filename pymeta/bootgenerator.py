@@ -3,8 +3,10 @@
 if __name__ == '__main__':
     import os, sys
     sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-    from pymeta import builder, grammar
-    fp = open(os.path.join(os.path.dirname(__file__), 'boot_generated.py'), 'wb')
-    ometa_grammar = grammar.OMetaGrammar(grammar.ometaGrammar)
-    tree = ometa_grammar.parseGrammar('BootOMetaGrammar', builder.TreeBuilder)
-    fp.write(builder.writeBoot(tree))
+    from pymeta.builder import TreeBuilder, writeBoot
+    from pymeta.grammar_definition import OMetaGrammar, ometaGrammar
+    ometa_grammar = OMetaGrammar(ometaGrammar)
+    tree = ometa_grammar.parseGrammar('BootOMetaGrammar', TreeBuilder)
+    path = os.path.join(os.path.dirname(__file__), 'boot_generated.py')
+    with open(path, 'w') as fp:
+        fp.write(writeBoot(tree))

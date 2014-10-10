@@ -1,5 +1,5 @@
 from pymeta.builder import TreeBuilder, moduleFromGrammar
-from pymeta.grammar import OMetaGrammar
+from pymeta.grammar_definition import OMetaGrammar
 from pymeta.runtime import _MaybeParseError, OMetaBase, EOFError
 from textwrap import dedent
 import unittest
@@ -94,7 +94,7 @@ class OMetaTestCase(unittest.TestCase):
         Input matches can be made on literal integers.
         """
         g = self.compile("stuff = 17 0x1F -2 0177")
-        self.assertEqual(g.stuff([17, 0x1f, -2, 0177]), 0177)
+        self.assertEqual(g.stuff([17, 0x1f, -2, 0o177]), 0o177)
         self.assertRaises(_MaybeParseError, g.stuff, [1, 2, 3])
 
 
@@ -494,7 +494,7 @@ class SelfHostingTest(OMetaTestCase):
         #imported here to prevent OMetaGrammar from being constructed before
         #tests are run
         if self.classTested is None:
-            from pymeta.grammar import OMetaGrammar
+            from pymeta.grammar_definition import OMetaGrammar
             self.classTested = OMetaGrammar
 
 
@@ -510,7 +510,7 @@ class NullOptimizerTest(OMetaTestCase):
 
         @param grammar: A string containing an OMeta grammar.
         """
-        from pymeta.grammar import OMetaGrammar, NullOptimizer
+        from pymeta.grammar_definition import OMetaGrammar, NullOptimizer
         g = OMetaGrammar(dedent(grammar))
         tree = g.parseGrammar('TestGrammar', TreeBuilder)
         opt = NullOptimizer([tree])
